@@ -58,6 +58,26 @@
         </div>
       </div>
 
+      <!-- Guests & Pets Selection -->
+        <div class="grid grid-cols-2 gap-3">
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">จำนวนผู้เข้าพัก</label>
+                <select id="guest-count" class="w-full border border-slate-300 rounded-lg p-2.5 bg-white text-sm focus:ring-2 focus:ring-emerald-500">
+                    <option value="1">1 คน</option>
+                    <option value="2" selected>2 คน</option>
+                    <option value="3">3 คน</option>
+                    <option value="4">4 คนขึ้นไป</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">สัตว์เลี้ยง</label>
+                <select id="pet-option" class="w-full border border-slate-300 rounded-lg p-2.5 bg-white text-sm focus:ring-2 focus:ring-emerald-500">
+                    <option value="ไม่มี" selected>ไม่มี</option>
+                    <option value="มี (น้องหมา/แมว)">มีสัตว์เลี้ยง</option>
+                </select>
+            </div>
+        </div>
+
       <!-- Phone Number -->
       <div>
         <label class="block text-sm font-medium text-slate-700 mb-1">เบอร์โทรศัพท์ติดต่อ</label>
@@ -98,23 +118,46 @@
     const N8N_BOOKING_WEBHOOK_URL = "https://whale-comedy-carlo-gained.trycloudflare.com/webhook/line-booking";
 
     // ตั้งค่าเริ่มต้นวันที่
-    const today = new Date().toISOString().split('T')[0];
-    const tomorrowDate = new Date();
-    tomorrowDate.setDate(tomorrowDate.getDate() + 1);
-    const tomorrow = tomorrowDate.toISOString().split('T')[0];
-    
-    document.getElementById('checkin-date').value = today;
-    document.getElementById('checkout-date').value = tomorrow;
+        const today = new Date().toISOString().split('T')[0];
+        const checkinInput = document.getElementById('checkin-date');
+        const checkoutInput = document.getElementById('checkout-date');
 
-    function calculatePrice() {
-      const roomSelect = document.getElementById('room-type');
-      const pricePerNight = parseInt(roomSelect.options[roomSelect.selectedIndex].getAttribute('data-price'));
-      
-      const checkin = new Date(document.getElementById('checkin-date').value);
-      const checkout = new Date(document.getElementById('checkout-date').value);
-      
-      let nights = Math.ceil((checkout - checkin) / (1000 * 60 * 60 * 24));
-      if (nights <= 0) nights = 1;
+        checkinInput.min = today;
+        checkinInput.value = today;
+
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        const tomorrowStr = tomorrow.toISOString().split('T')[0];
+        checkoutInput.min = tomorrowStr;
+        checkoutInput.value = tomorrowStr;
+
+        // เมื่อเปลี่ยนวันเช็คอิน ให้ปรับวันเช็คเอาท์อัตโนมัติ
+        checkinInput.addEventListener('change', function() {
+            const minCheckout = new Date(this.value);
+            minCheckout.setDate(minCheckout.getDate() + 1);
+            const minCheckoutStr = minCheckout.toISOString().split('T')[0];
+            checkoutInput.min = minCheckoutStr;
+            if (checkoutInput.value <= this.value) {
+                checkoutInput.value = minCheckoutStr;
+            }
+            calculatePrice();
+        });
+
+        checkoutInput.addEventListener('change', calculatePrice);
+
+        function calculatePrice() {
+            const roomSelect = document.getElementById('room-type');
+            const pricePerNight = parseInt(roomSelect.options[roomSelect.selectedIndex].getAttribute('data-price'));
+
+            const checkin = new Date(checkinInput.value);
+            const checkout = new Date(checkoutInput.value);
+
+            let nights = Math.ceil((checkout - checkin) / (1000 * 60 * 60 * 24));
+            if (nights <= 0) nights = 1;
+
+            document.getElementById('total-nights').innerText = nights;
+            document.getElementById('total-price').innerText = (pricePerNight * nights).toLocaleString();
+        }
       
       document.getElementById('total-nights').innerText = nights;
       document.getElementById('total-price').innerText = (pricePerNight * nights).toLocaleString();
@@ -151,20 +194,29 @@
     // ฟังก์ชันกดยืนยันการจอง
     document.getElementById('booking-form').addEventListener('submit', async (e) => {
       e.preventDefault();
+      const checkinInput = document.getElementById('checkin-date');
+        const checkoutInput = document.getElementById('checkout-date');
+
+        if (new Date(checkinInput.value) >= new Date(checkoutInput.value)) {
+            alert("วันเช็คเอาท์ต้องมาหลังวันเช็คอินอย่างน้อย 1 วันครับ");
+            return;
+        }
       const btn = document.getElementById('btn-submit');
       btn.innerText = "กำลังบันทึกข้อมูล...";
       btn.disabled = true;
 
       const payload = {
-        userId: document.getElementById('user-id').value,
-        userName: document.getElementById('user-name').innerText,
-        roomType: document.getElementById('room-type').value,
-        checkin: document.getElementById('checkin-date').value,
-        checkout: document.getElementById('checkout-date').value,
-        phone: document.getElementById('user-phone').value,
-        nights: document.getElementById('total-nights').innerText,
-        totalPrice: document.getElementById('total-price').innerText.replace(/,/g, '')
-      };
+            userId: document.getElementById('user-id').value,
+            userName: document.getElementById('user-name').innerText,
+            roomType: document.getElementById('room-type').value,
+            checkin: document.getElementById('checkin-date').value,
+            checkout: document.getElementById('checkout-date').value,
+            guests: document.getElementById('guest-count').value,
+            pets: document.getElementById('pet-option').value,
+            phone: document.getElementById('user-phone').value,
+            nights: document.getElementById('total-nights').innerText,
+            totalPrice: document.getElementById('total-price').innerText.replace(/,/g, '')
+        };
 
       try {
         if (N8N_BOOKING_WEBHOOK_URL !== "YOUR_N8N_WEBHOOK_URL_HERE") {

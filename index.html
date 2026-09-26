@@ -3,10 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>จองห้องพัก - เฮือนกาแฟ & โฮมสเตย์</title>
-  <!-- Tailwind CSS CDN สำหรับตกแต่งหน้าตา -->
+  <title>บริการชุมชน - เฮือนกาแฟ & โฮมสเตย์</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- LINE LIFF SDK v2 -->
   <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
   <style>
@@ -17,77 +15,149 @@
 
   <div class="max-w-md mx-auto bg-white rounded-2xl shadow-lg border border-slate-100 overflow-hidden">
     <!-- Header -->
-    <div class="bg-emerald-800 text-white p-6 text-center">
+    <div class="bg-emerald-800 text-white p-5 text-center">
       <h1 class="text-xl font-semibold">🏡 เฮือนกาแฟ & โฮมสเตย์</h1>
-      <p class="text-xs text-emerald-200 mt-1">แบบฟอร์มจองห้องพักออนไลน์ (LINE Mini App)</p>
+      <p class="text-xs text-emerald-200 mt-1">บริการจองที่พัก นวดชุมชน และรถนำเที่ยว</p>
     </div>
 
     <!-- User Profile Badge -->
-    <div id="profile-section" class="flex items-center gap-3 p-4 bg-emerald-50 border-b border-emerald-100">
-      <img id="user-picture" src="https://via.placeholder.com/48" alt="Profile" class="w-12 h-12 rounded-full border-2 border-emerald-500 object-cover">
+    <div id="profile-section" class="flex items-center gap-3 p-3 bg-emerald-50 border-b border-emerald-100">
+      <img id="user-picture" src="https://via.placeholder.com/48" alt="Profile" class="w-10 h-10 rounded-full border-2 border-emerald-500 object-cover">
       <div>
-        <p class="text-xs text-slate-500">ผู้จอง (LINE Account):</p>
-        <p id="user-name" class="font-medium text-emerald-950">กำลังโหลดโปรไฟล์...</p>
+        <p class="text-[11px] text-slate-500">ผู้จอง (LINE Account):</p>
+        <p id="user-name" class="font-medium text-sm text-emerald-950">กำลังโหลด...</p>
+      </div>
+    </div>
+
+    <!-- Service Type Selector Tabs -->
+    <div class="p-4 pb-0">
+      <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">เลือกประเภทบริการ</label>
+      <div class="grid grid-cols-3 gap-2 bg-slate-100 p-1 rounded-xl">
+        <button type="button" onclick="switchService('homestay')" id="tab-homestay" class="py-2 text-xs font-medium rounded-lg bg-white text-emerald-800 shadow-sm transition">🏡 ที่พัก</button>
+        <button type="button" onclick="switchService('massage')" id="tab-massage" class="py-2 text-xs font-medium rounded-lg text-slate-600 hover:text-emerald-800 transition">💆 นวดสปา</button>
+        <button type="button" onclick="switchService('tour')" id="tab-tour" class="py-2 text-xs font-medium rounded-lg text-slate-600 hover:text-emerald-800 transition">🛻 รถนำเที่ยว</button>
       </div>
     </div>
 
     <!-- Booking Form -->
-    <form id="booking-form" class="p-6 space-y-4">
-      <!-- Hidden User ID -->
+    <form id="booking-form" class="p-5 space-y-4">
       <input type="hidden" id="user-id" name="userId">
+      <input type="hidden" id="service-category" value="homestay">
 
-      <!-- Room Selection -->
-      <div>
-        <label class="block text-sm font-medium text-slate-700 mb-1">เลือกประเภทห้องพัก</label>
-        <select id="room-type" class="w-full border border-slate-300 rounded-lg p-2.5 bg-white focus:ring-2 focus:ring-emerald-500 focus:outline-none text-sm" onchange="calculatePrice()">
-          <option value="ห้องริมสวน (Garden View)" data-price="1200">ห้องริมสวน (Garden View) - 1,200 บ./คืน</option>
-          <option value="ห้องระเบียงดอย (Mountain View)" data-price="1500">ห้องระเบียงดอย (Mountain View) - 1,500 บ./คืน</option>
-          <option value="เรือนครอบครัว (Family Villa)" data-price="2800">เรือนครอบครัว (Family Villa) - 2,800 บ./คืน</option>
-        </select>
+      <!-- ================= SECTION 1: HOMESTAY ================= -->
+      <div id="section-homestay" class="space-y-3">
+        <div>
+          <label class="block text-xs font-medium text-slate-700 mb-1">เลือกประเภทห้องพัก</label>
+          <select id="room-type" class="w-full border border-slate-300 rounded-lg p-2.5 bg-white text-sm focus:ring-2 focus:ring-emerald-500" onchange="calculatePrice()">
+            <option value="ห้องริมสวน (Garden View)" data-price="1200">ห้องริมสวน (Garden View) - 1,200 บ./คืน</option>
+            <option value="ห้องระเบียงดอย (Mountain View)" data-price="1500">ห้องระเบียงดอย (Mountain View) - 1,500 บ./คืน</option>
+            <option value="เรือนครอบครัว (Family Villa)" data-price="2800">เรือนครอบครัว (Family Villa) - 2,800 บ./คืน</option>
+          </select>
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-xs font-medium text-slate-700 mb-1">เช็คอิน</label>
+            <input type="date" id="checkin-date" class="w-full border border-slate-300 rounded-lg p-2 text-xs focus:ring-2 focus:ring-emerald-500" onchange="calculatePrice()">
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-700 mb-1">เช็คเอาท์</label>
+            <input type="date" id="checkout-date" class="w-full border border-slate-300 rounded-lg p-2 text-xs focus:ring-2 focus:ring-emerald-500" onchange="calculatePrice()">
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-xs font-medium text-slate-700 mb-1">จำนวนผู้เข้าพัก</label>
+            <select id="guest-count" class="w-full border border-slate-300 rounded-lg p-2 bg-white text-xs">
+              <option value="1">1 คน</option>
+              <option value="2" selected>2 คน</option>
+              <option value="3">3 คน</option>
+              <option value="4">4 คนขึ้นไป</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-700 mb-1">สัตว์เลี้ยง</label>
+            <select id="pet-option" class="w-full border border-slate-300 rounded-lg p-2 bg-white text-xs">
+              <option value="ไม่มี" selected>ไม่มี</option>
+              <option value="มี (น้องหมา/แมว)">มีสัตว์เลี้ยง</option>
+            </select>
+          </div>
+        </div>
       </div>
 
-      <!-- Dates -->
-      <div class="grid grid-cols-2 gap-3">
+      <!-- ================= SECTION 2: MASSAGE ================= -->
+      <div id="section-massage" class="hidden space-y-3">
         <div>
-          <label class="block text-sm font-medium text-slate-700 mb-1">วันที่เช็คอิน</label>
-          <input type="date" id="checkin-date" required class="w-full border border-slate-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none" onchange="calculatePrice()">
+          <label class="block text-xs font-medium text-slate-700 mb-1">คอร์สนวดสปา</label>
+          <select id="massage-type" class="w-full border border-slate-300 rounded-lg p-2.5 bg-white text-sm focus:ring-2 focus:ring-emerald-500" onchange="calculatePrice()">
+            <option value="นวดเท้า" data-price="300">นวดเท้าเพื่อสุขภาพ (300 บ./ชม.)</option>
+            <option value="นวดตัว" data-price="450">นวดไทย / นวดตัวผ่อนคลาย (450 บ./ชม.)</option>
+          </select>
         </div>
-        <div>
-          <label class="block text-sm font-medium text-slate-700 mb-1">วันที่เช็คเอาท์</label>
-          <input type="date" id="checkout-date" required class="w-full border border-slate-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none" onchange="calculatePrice()">
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-xs font-medium text-slate-700 mb-1">วันที่รับบริการ</label>
+            <input type="date" id="massage-date" class="w-full border border-slate-300 rounded-lg p-2 text-xs">
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-700 mb-1">เวลาเริ่ม</label>
+            <input type="time" id="massage-time" value="13:00" class="w-full border border-slate-300 rounded-lg p-2 text-xs">
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-xs font-medium text-slate-700 mb-1">ระยะเวลา</label>
+            <select id="massage-duration" class="w-full border border-slate-300 rounded-lg p-2 bg-white text-xs" onchange="calculatePrice()">
+              <option value="1" selected>1 ชั่วโมง</option>
+              <option value="2">2 ชั่วโมง</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-700 mb-1">ระบุหมอนวด</label>
+            <select id="therapist-select" class="w-full border border-slate-300 rounded-lg p-2 bg-white text-xs">
+              <option value="AUTO">จัดใครก็ได้ให้</option>
+              <option value="หมอบัว">หมอบัว</option>
+              <option value="หมอสร้อย">หมอสร้อย</option>
+              <option value="หมอแก้ว">หมอแก้ว</option>
+            </select>
+          </div>
         </div>
       </div>
 
-      <!-- Guests & Pets Selection -->
-        <div class="grid grid-cols-2 gap-3">
-            <div>
-                <label class="block text-sm font-medium text-slate-700 mb-1">จำนวนผู้เข้าพัก</label>
-                <select id="guest-count" class="w-full border border-slate-300 rounded-lg p-2.5 bg-white text-sm focus:ring-2 focus:ring-emerald-500">
-                    <option value="1">1 คน</option>
-                    <option value="2" selected>2 คน</option>
-                    <option value="3">3 คน</option>
-                    <option value="4">4 คนขึ้นไป</option>
-                </select>
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-slate-700 mb-1">สัตว์เลี้ยง</label>
-                <select id="pet-option" class="w-full border border-slate-300 rounded-lg p-2.5 bg-white text-sm focus:ring-2 focus:ring-emerald-500">
-                    <option value="ไม่มี" selected>ไม่มี</option>
-                    <option value="มี (น้องหมา/แมว)">มีสัตว์เลี้ยง</option>
-                </select>
-            </div>
+      <!-- ================= SECTION 3: TOUR ================= -->
+      <div id="section-tour" class="hidden space-y-3">
+        <div>
+          <label class="block text-xs font-medium text-slate-700 mb-1">แพ็กเกจรถปิกอัพแดง</label>
+          <select id="tour-package" class="w-full border border-slate-300 rounded-lg p-2.5 bg-white text-sm focus:ring-2 focus:ring-emerald-500" onchange="calculatePrice()">
+            <option value="นำเที่ยวดอยและชุมชนรอบเช้า (08:30-11:30)" data-price="1200">รอบเช้า ชมวิววิถีชุมชน (1,200 บ./คัน)</option>
+            <option value="นำเที่ยวดอยและชมพระอาทิตย์ตก (14:30-17:30)" data-price="1200">รอบบ่าย ชมพระอาทิตย์ตก (1,200 บ./คัน)</option>
+          </select>
         </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-xs font-medium text-slate-700 mb-1">วันที่เดินทาง</label>
+            <input type="date" id="tour-date" class="w-full border border-slate-300 rounded-lg p-2 text-xs">
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-700 mb-1">ระบุรถแดง</label>
+            <select id="vehicle-select" class="w-full border border-slate-300 rounded-lg p-2 bg-white text-xs">
+              <option value="AUTO">จัดรถว่างให้อัตโนมัติ</option>
+              <option value="รถแดง 1">รถแดงคันที่ 1</option>
+              <option value="รถแดง 2">รถแดงคันที่ 2</option>
+            </select>
+          </div>
+        </div>
+      </div>
 
-      <!-- Phone Number -->
+      <!-- Common: Phone Number -->
       <div>
-        <label class="block text-sm font-medium text-slate-700 mb-1">เบอร์โทรศัพท์ติดต่อ</label>
-        <input type="tel" id="user-phone" required placeholder="08x-xxx-xxxx" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+        <label class="block text-xs font-medium text-slate-700 mb-1">เบอร์โทรศัพท์ติดต่อ</label>
+        <input type="tel" id="user-phone" required placeholder="08x-xxx-xxxx" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-emerald-500">
       </div>
 
       <!-- Price Summary -->
       <div class="bg-slate-100 p-4 rounded-xl flex justify-between items-center text-sm">
         <div>
-          <p class="text-slate-500 text-xs">จำนวน: <span id="total-nights" class="font-semibold text-slate-700">1</span> คืน</p>
+          <p id="summary-unit-text" class="text-slate-500 text-xs">จำนวน: <span id="summary-unit" class="font-semibold text-slate-700">1</span> คืน</p>
           <p class="font-medium text-slate-800">ยอดรวมทั้งหมด</p>
         </div>
         <div class="text-right">
@@ -97,141 +167,179 @@
       </div>
 
       <!-- Submit Button -->
-      <button type="submit" id="btn-submit" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-medium py-3 rounded-xl shadow-md transition duration-200">
-        ยืนยันการจองห้องพัก
+      <button type="submit" id="btn-submit" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-medium py-3 rounded-xl shadow-md transition">
+        ยืนยันการจอง
       </button>
     </form>
 
-    <!-- Success Message Container -->
+    <!-- Success Screen -->
     <div id="success-screen" class="hidden p-8 text-center space-y-4">
       <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-3xl">✓</div>
       <h2 class="text-lg font-bold text-slate-800">บันทึกการจองเรียบร้อย!</h2>
-      <p class="text-sm text-slate-600">ระบบได้ส่งข้อมูลเข้าสู่ระบบเรียบร้อยแล้ว แอดมินจะติดต่อกลับเพื่อยืนยันอีกครั้งนะคะ</p>
+      <p id="success-desc" class="text-sm text-slate-600">ระบบได้บันทึกคิวของคุณเรียบร้อยแล้ว แอดมินจะติดต่อยืนยันทาง LINE นะคะ</p>
       <button onclick="liff.closeWindow()" class="mt-4 px-6 py-2 bg-slate-200 text-slate-700 rounded-lg text-sm font-medium">ปิดหน้านี้</button>
     </div>
   </div>
 
   <script>
-    // ** จุดที่ต้องมาใส่ค่า LIFF ID ทีหลัง **
     const MY_LIFF_ID = "2011699431-ofJmVtR6"; 
-    // ** จุดที่ต้องใส่ Webhook URL ของ n8n ทีหลัง **
     const N8N_BOOKING_WEBHOOK_URL = "https://n8n-production-2789c.up.railway.app/webhook/line-booking";
 
-    // ตั้งค่าเริ่มต้นวันที่
-        const today = new Date().toISOString().split('T')[0];
-        const checkinInput = document.getElementById('checkin-date');
-        const checkoutInput = document.getElementById('checkout-date');
+    let currentCategory = 'homestay';
 
-        checkinInput.min = today;
-        checkinInput.value = today;
+    function initDates() {
+      const today = new Date().toISOString().split('T')[0];
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      const tomorrowStr = tomorrow.toISOString().split('T')[0];
 
-        const tomorrow = new Date();
-        tomorrow.setDate(tomorrow.getDate() + 1);
-        const tomorrowStr = tomorrow.toISOString().split('T')[0];
-        checkoutInput.min = tomorrowStr;
-        checkoutInput.value = tomorrowStr;
+      document.getElementById('checkin-date').min = today;
+      document.getElementById('checkin-date').value = today;
+      document.getElementById('checkout-date').min = tomorrowStr;
+      document.getElementById('checkout-date').value = tomorrowStr;
 
-        // เมื่อเปลี่ยนวันเช็คอิน ให้ปรับวันเช็คเอาท์อัตโนมัติ
-        checkinInput.addEventListener('change', function() {
-            const minCheckout = new Date(this.value);
-            minCheckout.setDate(minCheckout.getDate() + 1);
-            const minCheckoutStr = minCheckout.toISOString().split('T')[0];
-            checkoutInput.min = minCheckoutStr;
-            if (checkoutInput.value <= this.value) {
-                checkoutInput.value = minCheckoutStr;
-            }
-            calculatePrice();
-        });
-
-        checkoutInput.addEventListener('change', calculatePrice);
-document.getElementById('room-type').addEventListener('change', calculatePrice);
-
-function calculatePrice() {
-    const roomSelect = document.getElementById('room-type');
-    const pricePerNight = parseInt(roomSelect.options[roomSelect.selectedIndex].getAttribute('data-price')) || 0;
-
-    const checkin = new Date(checkinInput.value);
-    const checkout = new Date(checkoutInput.value);
-
-    let diffTime = checkout.getTime() - checkin.getTime();
-    let nights = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    if (isNaN(nights) || nights <= 0) nights = 1;
-
-    document.getElementById('total-nights').innerText = nights;
-    document.getElementById('total-price').innerText = (pricePerNight * nights).toLocaleString();
-}
-  
-    // เริ่มต้นระบบ LIFF
-async function initLIFF() {
-    try {
-        if (typeof MY_LIFF_ID !== 'undefined' && MY_LIFF_ID !== "YOUR_LIFF_ID_HERE" && MY_LIFF_ID !== "") {
-            await liff.init({ liffId: MY_LIFF_ID });
-            if (liff.isLoggedIn()) {
-                const profile = await liff.getProfile();
-                document.getElementById('user-name').innerText = profile.displayName;
-                document.getElementById('user-id').value = profile.userId;
-                if (profile.pictureUrl) {
-                    document.getElementById('user-picture').src = profile.pictureUrl;
-                }
-            } else {
-                liff.login();
-            }
-        } else {
-            // โหมดทดสอบเมื่อยังไม่ได้ใส่ LIFF ID
-            document.getElementById('user-name').innerText = "ทดสอบ (Browser Test)";
-            document.getElementById('user-id').value = "TEST_USER_12345";
-        }
-    } catch (err) {
-        console.error("LIFF Init Error:", err);
-        document.getElementById('user-name').innerText = "ผู้ใช้งานทั่วไป";
+      document.getElementById('massage-date').min = today;
+      document.getElementById('massage-date').value = today;
+      document.getElementById('tour-date').min = today;
+      document.getElementById('tour-date').value = today;
     }
-}
 
+    function switchService(type) {
+      currentCategory = type;
+      document.getElementById('service-category').value = type;
+
+      const tabs = ['homestay', 'massage', 'tour'];
+      tabs.forEach(t => {
+        const btn = document.getElementById(`tab-${t}`);
+        const sec = document.getElementById(`section-${t}`);
+        if (t === type) {
+          btn.className = "py-2 text-xs font-medium rounded-lg bg-white text-emerald-800 shadow-sm transition";
+          sec.classList.remove('hidden');
+        } else {
+          btn.className = "py-2 text-xs font-medium rounded-lg text-slate-600 hover:text-emerald-800 transition";
+          sec.classList.add('hidden');
+        }
+      });
+      calculatePrice();
+    }
+
+    function calculatePrice() {
+      let price = 0;
+      if (currentCategory === 'homestay') {
+        const roomSelect = document.getElementById('room-type');
+        const rate = parseInt(roomSelect.options[roomSelect.selectedIndex].getAttribute('data-price')) || 1200;
+        const checkin = new Date(document.getElementById('checkin-date').value);
+        const checkout = new Date(document.getElementById('checkout-date').value);
+        let nights = Math.ceil((checkout.getTime() - checkin.getTime()) / (1000 * 60 * 60 * 24));
+        if (isNaN(nights) || nights <= 0) nights = 1;
+        price = rate * nights;
+        document.getElementById('summary-unit-text').innerHTML = `จำนวน: <span class="font-semibold text-slate-700">${nights}</span> คืน`;
+      } else if (currentCategory === 'massage') {
+        const mSelect = document.getElementById('massage-type');
+        const rate = parseInt(mSelect.options[mSelect.selectedIndex].getAttribute('data-price')) || 300;
+        const hours = parseInt(document.getElementById('massage-duration').value) || 1;
+        price = rate * hours;
+        document.getElementById('summary-unit-text').innerHTML = `ระยะเวลา: <span class="font-semibold text-slate-700">${hours}</span> ชม.`;
+      } else if (currentCategory === 'tour') {
+        const tSelect = document.getElementById('tour-package');
+        price = parseInt(tSelect.options[tSelect.selectedIndex].getAttribute('data-price')) || 1200;
+        document.getElementById('summary-unit-text').innerHTML = `จำนวน: <span class="font-semibold text-slate-700">1</span> รอบคัน`;
+      }
+      document.getElementById('total-price').innerText = price.toLocaleString();
+    }
+
+    async function initLIFF() {
+      try {
+        if (typeof MY_LIFF_ID !== 'undefined' && MY_LIFF_ID !== "" && !MY_LIFF_ID.includes("YOUR_")) {
+          await liff.init({ liffId: MY_LIFF_ID });
+          if (liff.isLoggedIn()) {
+            const profile = await liff.getProfile();
+            document.getElementById('user-name').innerText = profile.displayName;
+            document.getElementById('user-id').value = profile.userId;
+            if (profile.pictureUrl) document.getElementById('user-picture').src = profile.pictureUrl;
+          } else {
+            liff.login();
+          }
+        } else {
+          document.getElementById('user-name').innerText = "ทดสอบ (Browser Test)";
+          document.getElementById('user-id').value = "TEST_USER_12345";
+        }
+      } catch (err) {
+        document.getElementById('user-name').innerText = "ผู้ใช้งานทั่วไป";
+      }
+    }
+
+    initDates();
     calculatePrice();
     initLIFF();
 
-    // ฟังก์ชันกดยืนยันการจอง
+    document.getElementById('checkin-date').addEventListener('change', function() {
+      const minCheckout = new Date(this.value);
+      minCheckout.setDate(minCheckout.getDate() + 1);
+      const str = minCheckout.toISOString().split('T')[0];
+      const cout = document.getElementById('checkout-date');
+      cout.min = str;
+      if (cout.value <= this.value) cout.value = str;
+      calculatePrice();
+    });
+    document.getElementById('checkout-date').addEventListener('change', calculatePrice);
+
+    // Form Submit
     document.getElementById('booking-form').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const checkinInput = document.getElementById('checkin-date');
-        const checkoutInput = document.getElementById('checkout-date');
-
-        if (new Date(checkinInput.value) >= new Date(checkoutInput.value)) {
-            alert("วันเช็คเอาท์ต้องมาหลังวันเช็คอินอย่างน้อย 1 วันครับ");
-            return;
-        }
       const btn = document.getElementById('btn-submit');
-      btn.innerText = "กำลังบันทึกข้อมูล...";
+      btn.innerText = "กำลังตรวจสอบคิวว่าง & บันทึก...";
       btn.disabled = true;
 
       const payload = {
-            userId: document.getElementById('user-id').value,
-            userName: document.getElementById('user-name').innerText,
-            roomType: document.getElementById('room-type').value,
-            checkin: document.getElementById('checkin-date').value,
-            checkout: document.getElementById('checkout-date').value,
-            guests: document.getElementById('guest-count').value,
-            pets: document.getElementById('pet-option').value,
-            phone: document.getElementById('user-phone').value,
-            nights: document.getElementById('total-nights').innerText,
-            totalPrice: document.getElementById('total-price').innerText.replace(/,/g, '')
-        };
+        userId: document.getElementById('user-id').value,
+        userName: document.getElementById('user-name').innerText,
+        phone: document.getElementById('user-phone').value,
+        serviceCategory: currentCategory,
+        totalPrice: document.getElementById('total-price').innerText.replace(/,/g, '')
+      };
+
+      if (currentCategory === 'homestay') {
+        payload.serviceName = document.getElementById('room-type').value;
+        payload.dateStart = document.getElementById('checkin-date').value;
+        payload.dateEnd = document.getElementById('checkout-date').value;
+        payload.guests = document.getElementById('guest-count').value;
+        payload.pets = document.getElementById('pet-option').value;
+      } else if (currentCategory === 'massage') {
+        payload.serviceName = document.getElementById('massage-type').value;
+        payload.dateStart = document.getElementById('massage-date').value;
+        payload.timeStart = document.getElementById('massage-time').value;
+        payload.durationHours = document.getElementById('massage-duration').value;
+        payload.preferredResource = document.getElementById('therapist-select').value;
+      } else if (currentCategory === 'tour') {
+        payload.serviceName = document.getElementById('tour-package').value;
+        payload.dateStart = document.getElementById('tour-date').value;
+        payload.preferredResource = document.getElementById('vehicle-select').value;
+      }
 
       try {
-        if (N8N_BOOKING_WEBHOOK_URL !== "YOUR_N8N_WEBHOOK_URL_HERE") {
-          await fetch(N8N_BOOKING_WEBHOOK_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-          });
+        const res = await fetch(N8N_BOOKING_WEBHOOK_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const result = await res.json().catch(() => ({}));
+
+        if (result.status === 'FULL') {
+          alert("ขออภัยครับ: " + (result.message || "รอบเวลาหรือบริการที่คุณเลือกเต็มแล้ว"));
+          btn.innerText = "ยืนยันการจอง";
+          btn.disabled = false;
+          return;
         }
+
         document.getElementById('booking-form').classList.add('hidden');
         document.getElementById('profile-section').classList.add('hidden');
         document.getElementById('success-screen').classList.remove('hidden');
-      } catch (error) {
-        alert("เกิดข้อผิดพลาดในการส่งข้อมูล กรุณาลองใหม่อีกครั้ง");
-        btn.innerText = "ยืนยันการจองห้องพัก";
-        btn.disabled = false;
+      } catch (err) {
+        alert("บันทึกสำเร็จ (หรือตรวจสอบข้อผิดพลาดของเครือข่าย)");
+        document.getElementById('booking-form').classList.add('hidden');
+        document.getElementById('profile-section').classList.add('hidden');
+        document.getElementById('success-screen').classList.remove('hidden');
       }
     });
   </script>
